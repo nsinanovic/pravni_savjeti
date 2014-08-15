@@ -1,0 +1,7 @@
+<% current_user.update_attribute(:email, '') %>
+
+<br>
+<div class="alert alert-danger alert-dismissable">
+  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+  Vaš korisnički račun je deaktiviran! <%= link_to 'Početna', log_out_path %>
+</div>

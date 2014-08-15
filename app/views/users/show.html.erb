@@ -1,0 +1,236 @@
+
+
+<!-- Navigation -->
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <div class="navbar-brand"> <%= link_to 'Pravni savjeti', root_path %></div>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+
+        <% if current_user %>
+            <% b=0 %>
+            <% @problems = Problem.all %>
+            <% @problems.each do |p| %>
+                <% if p.user == current_user.id %>
+
+                    <% @comments = Comment.all %>
+                    <% @comments.each do |c| %>
+                        <% if c.additional == "Nepročitan"  %>
+                            <% if c.problem_id == p.id %>
+                                <% b = b+1; %>
+                            <% end %>
+                        <% end %>
+                    <% end %>
+                <% end %>
+            <% end %>
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-info" > </i> Obavještenja (<%=b%>) <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <% @problems = Problem.all %>
+                <% @problems.each do |p| %>
+                    <% if p.user == current_user.id %>
+
+                        <% @comments = Comment.all %>
+                        <% @comments.each do |c| %>
+                            <% if c.additional == "Nepročitan"  %>
+                                <% if c.problem_id == p.id %>
+                                    <% komentar = ' Imate novi komentar na ' + p.title %>
+                                    <li>  <%= link_to komentar, problem_path(p.id) %>  </li>
+                                <% end %>
+                            <% end %>
+                        <% end %>
+                    <% end %>
+                <% end %>
+                <% if b==0 %> <li><a>Nemate novih obavještenja</a></li><% end %>
+              </ul>
+            </li>
+
+
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-male" > </i> <%= current_user.name %> <%= current_user.surname %> <b class="caret"> </b></a>
+              <ul class="dropdown-menu">
+                <li>  <%= link_to 'Moj profil', user_path(current_user.id) %>  </li>
+                <li>  <%= link_to 'Postavke', edit_user_path(current_user.id) %>  </li>
+                <li>  <%= link_to 'Odjava', log_out_path %> </li>
+              </ul>
+            </li>
+
+
+        <% else %>
+            <li>
+              <%= link_to 'Registracija', new_user_path %>
+            </li>
+            <li>
+              <%= link_to 'Prijava', log_in_path %>
+            </li>
+
+        <% end %>
+      </ul>
+    </div>
+    <!-- /.navbar-collapse -->
+  </div>
+  <!-- /.container -->
+</nav>
+
+<!-- Page Content -->
+<div class="container">
+
+  <!-- Page Heading/Breadcrumbs -->
+  <div class="row">
+    <div class="col-lg-12">
+
+      <h1 class="page-header"><i class="fa fa-question-circle"> </i> Pravni savjeti
+        <small>Podijelite svoja iskustva</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li> <%= link_to 'Početna', root_path %> </li>
+        <li class="active">Korisnički profil</li>
+      </ol>
+    </div>
+  </div>
+  <!-- /.row -->
+
+  <!-- Content Row -->
+  <div class="row">
+
+
+    <!-- Blog Post Content Column -->
+    <div class="col-lg-9">
+      <div class="row">
+        <!-- Content Column -->
+        <div class="col-md-4">
+          <% if @user.avatar.blank? %>
+              <p><img src="/assets/avatar.png" height="340" width="260"></p>
+
+          <% else %>
+              <p><img src= <%= @user.avatar_url %> height="340" width="260"></p>
+          <% end %>
+
+          <hr>
+         <strong class="text-center"> <i class="fa fa-star "></i> <%= @user.stars %>  </strong><br><br>
+          <small > (Broj zvjezdica raste u odnosu na broj pozitivno ocjenjenih komentara i broj riješenih pitanja)</small><br><br>
+          <% if current_user.id == @user.id %> <a class="fa fa-eraser"> </a> <%= link_to 'Deaktiviraj svoj račun', users_path, data: { confirm: 'Jeste li sigurni da želite deaktivirati svoj korisnički račun?' } %><% end %>
+
+        </div>
+
+        <div class="col-md-8">
+          <h3>
+            <p> <%= @user.name %> <%= @user.surname%></p>
+          </h3>
+          <hr>
+          <p><i class="fa fa-male"> </i> Korisničko ime: <%= @user.username %>      </p>
+          <p><i class="fa fa-envelope-o"> </i> Email: <%= @user.email %>       </p>
+          <% if current_user.id == @user.id %><p><a class="fa fa-key"> </a>  <%= link_to 'Promijeni šifru', edit_user_path(@user) %>       </p><% end %>
+          <hr>
+          <p><i class="fa fa-clock-o"> </i> Registrovan/a prije <%= time_ago_in_words(@user.created_at) %>     </p>
+          <p><i class="fa fa-star"> </i> Ima <%= @user.stars %> zvjezdica      </p>
+
+          <%
+             p = 0
+             @problems = Problem.all
+             @problems.each do |problem|
+                if problem.user == @user.id
+                  p = p + 1
+                end
+             end
+             k = 0
+             @comments = Comment.all
+             @comments.each do |comment|
+               if comment.user == @user.id
+                 k = k + 1
+               end
+             end
+
+
+          %>
+
+
+
+          <p><i class="fa fa-question-circle"> </i>  Objavio/la <%=p%> pitanja      </p>
+          <p><i class="fa fa-comment-o"> </i>  Objavio/la <%=k%>  komentara     </p>
+          <hr>
+          <p><%= @user.profile %></p>
+            <hr>
+          <p><%= @user.additional %></p>
+
+          <% if current_user.id == @user.id %>
+              <hr>
+          <p> <a class="fa fa-edit"> </a> <%= link_to 'Uredi svoj profil', edit_user_path(@user)%></p>
+         <% end %>
+        </div>
+      </div>
+
+
+    </div>
+
+    <!-- Blog Sidebar Widgets Column -->
+    <div class="col-md-3">
+      <div class="panel panel-default ">
+        <div class="panel-heading text-center">
+          <h3 class="panel-title">Pitanja od ovog korisnika </h3>
+        </div>
+
+        <ul class="list-group">
+          <% @problems = Problem.all %>
+          <% @problems.each do |p| %>
+              <% if @user.id == p.user %>
+                  <li class="list-group-item"> <i class="fa fa-question-circle"> </i>   <%= link_to p.title, problem_path(p.id) %> </li>
+              <% end %>
+          <% end %>
+        </ul>
+      </div>
+
+
+      <p> <a class="fa fa-question-circle"> </a> <%= link_to 'Objavi novo pitanje', new_problem_path %></p>
+
+    </div>
+
+
+
+
+
+
+
+  </div>
+  <!-- /.row -->
+
+  <hr>
+
+  <!-- Footer -->
+  <footer>
+    <div class="row">
+      <div class="col-lg-12">
+        <p>Copyright &copy; Nusreta Sinanović 2014 | nusretasinanovic@gmail.com</p>
+      </div>
+    </div>
+  </footer>
+
+</div>
+<!-- /.container -->
+
+<!-- jQuery Version 1.11.0 -->
+<script src="js/jquery-1.11.0.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="js/bootstrap.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
