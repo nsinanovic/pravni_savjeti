@@ -52,7 +52,7 @@ gem 'wash_out'
 
 gem 'prawn'
 
-gem 'rails_12factor'
+gem 'rails_12factor', group: :production
 
 gem 'prawn-layout'
 
@@ -66,3 +66,4 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.0.0.beta'
 end
 
+ruby "1.9.3"
